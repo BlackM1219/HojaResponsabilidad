@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Formulario DISAGRO - Sistema completo con integración a Teams
 Versión con Power Automate Webhook
@@ -23,12 +23,12 @@ import os
 import requests
 import base64
 
-TEMPLATE_PATH = "https://default93a2cd4474774ba69ca3e4e7aaf9c2.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0f4c9b26740b401c9681e227af854f4e/triggers/manual/paths/invoke?api-version=1"
+TEMPLATE_PATH = "plantilla.xlsx"
 
 # ============================================
 # 🔧 CONFIGURA AQUÍ TU URL DEL WEBHOOK
 # ============================================
-WEBHOOK_URL = "PEGA_TU_URL_AQUI"
+WEBHOOK_URL = "https://default93a2cd4474774ba69ca3e4e7aaf9c2.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0f4c9b26740b401c9681e227af854f4e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=wfREfiqzfGGgVHBoQajhWsotqJs7m6_FbPD8zq1mnwc"
 # Ejemplo:
 # WEBHOOK_URL = "https://prod-25.westus.logic.azure.com:443/workflows/abc123..."
 # ============================================
@@ -100,7 +100,8 @@ class TeamsWebhook:
         """Envía archivo a Teams mediante webhook de Power Automate"""
         
         # Verificar que el webhook esté configurado
-        if "PEGA_TU_URL_AQUI" in self.webhook_url or not self.webhook_url.startswith("http"):
+        webhook_url = (self.webhook_url or "").strip()
+        if not webhook_url or "PEGA_TU_URL_AQUI" in webhook_url or not webhook_url.startswith("http"):
             messagebox.showerror(
                 "⚠️ Webhook no configurado",
                 "Debes configurar el WEBHOOK_URL en el código.\n\n"
@@ -110,7 +111,7 @@ class TeamsWebhook:
                 "3. Copia la 'HTTP POST URL'\n"
                 "4. Pégala en la variable WEBHOOK_URL (línea 30)\n\n"
                 "La URL debe empezar con:\n"
-                "https://prod-..."
+                "https://..."
             )
             return False
         
@@ -134,7 +135,7 @@ class TeamsWebhook:
             
             # Enviar al webhook
             response = requests.post(
-                self.webhook_url,
+                webhook_url,
                 json=payload,
                 headers={"Content-Type": "application/json"},
                 timeout=30
